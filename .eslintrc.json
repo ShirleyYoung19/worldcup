@@ -1,0 +1,59 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "jest": true
+  },
+  "extends": "airbnb",
+  "globals": {
+    "__DEVELOPMENT__": true,
+    "__CLIENT__": true,
+    "__SERVER__": true,
+    "__DEVTOOLS__": true,
+    "__GIT_REVISION__": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true,
+      "arrowFunctions": true,
+      "classes": true,
+      "modules": true,
+      "defaultParams": true
+    },
+    "sourceType": "module"
+  },
+  "plugins": ["compat"],
+  "rules": {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "function-paren-newline": ["error", "consistent"],
+    "max-len": ["warn", { "code": 200 }],
+    "no-confusing-arrow": ["error", { "allowParens": true }],
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-use-before-define": ["error", "nofunc"],
+    "no-underscore-dangle": "off",
+    "object-curly-newline": ["error", { "consistent": true } ],
+    "space-before-function-paren": ["error", { "anonymous": "always", "named": "always", "asyncArrow": "ignore" }],
+    "spaced-comment": ["error", "always", { "exceptions": ["*"] }],
+
+    "react/jsx-indent": ["error", 2],
+    "react/jsx-indent-props": ["error", 2],
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/forbid-prop-types": ["error", { "forbid": ["any", "array"] }],
+
+    "jsx-a11y/label-has-for": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack.config.dev.js"
+      }
+    }
+  }
+}
