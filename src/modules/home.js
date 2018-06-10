@@ -5,8 +5,60 @@ import { CALL_GQL } from 'store/middleware/client';
 /*****************************************************************************
  * Selectors
  *****************************************************************************/
+
+const combineMatchAndTeam = (matches, teams) => {
+  const result = [];
+  matches.forEach(({ homeTeam, awayTeam, ...others } = {}) => {
+    const { name: homeTeamName, flagUrl: homeTeamFlag } = teams.find(({ _id }) => (String(_id) === String(homeTeam))) || {};
+    const { name: awayTeamName, flagUrl: awayTeamFlag } = teams.find(({ _id }) => (String(_id) === String(awayTeam))) || {};
+    result.push({
+      homeTeam,
+      awayTeam,
+      ...others,
+      homeTeamName,
+      homeTeamFlag,
+      awayTeamName,
+      awayTeamFlag,
+    });
+  });
+
+  result.sort((a, b) => a.matchIndex - b.matchIndex);
+
+  return result;
+};
+
 export const getUser = state => state.getIn(['modules', 'home', 'user']);
 export const getTz = state => state.getIn(['modules', 'home', 'tz']);
+
+export const getTeam = state => state.getIn(['modules', 'home', 'team']);
+export const getMatch = state => state.getIn(['modules', 'home', 'match']);
+
+export const onGoingMatch = createSelector(
+  getTeam,
+  getMatch,
+  (teams = [], matches = []) => {
+    const filteredMatches = matches.filter(({ started, available } = {}) => !started && available) || [];
+    return combineMatchAndTeam(filteredMatches, teams);
+  },
+);
+
+export const doneMatch = createSelector(
+  getTeam,
+  getMatch,
+  (teams = [], matches = []) => {
+    const filteredMatches = matches.filter(({ started, available } = {}) => started && available) || [];
+    return combineMatchAndTeam(filteredMatches, teams);
+  },
+);
+
+export const togoMatch = createSelector(
+  getTeam,
+  getMatch,
+  (teams = [], matches = []) => {
+    const filteredMatches = matches.filter(({ started, available } = {}) => !started && !available) || [];
+    return combineMatchAndTeam(filteredMatches, teams);
+  },
+);
 
 /*****************************************************************************
  * GraphQL
@@ -36,17 +88,26 @@ place
 offset
 }}`;
 
-const graphqlUsersRanking = `{
-  UsersRanking {
-  nickName
-  email
-  guessScore
-  goldenPlayerGuessRecord
-}}`;
+const graphqlMatch = `{
+  Match{
+  matchIndex
+  homeTeam
+  awayTeam
+  homeTeamScore
+  awayTeamScore
+  startTime
+  stage
+  label
+  winner
+  available
+  endWay
+  started
+}
+}`;
 
-const graphqlTeams = `{
-  Teams {
-  _id
+const graphqlTeam = `{
+  Teams{
+_id
 name
 flagUrl
 group
@@ -58,11 +119,23 @@ age
 goal
 pos
 }
+}
+}`;
+
+const graphqlUsersRanking = `{
+  UsersRanking {
+  nickName
+  email
+  guessScore
+  goldenPlayerGuessRecord
 }}`;
+
 
 /*****************************************************************************
  * Types & Action Creators
  *****************************************************************************/
+
+/** ******* USER ********/
 
 export const QUERY_USER_REQUEST = 'modules/home/QUERY_USER_REQUEST';
 export const QUERY_USER_SUCCESS = 'modules/home/QUERY_USER_SUCCESS';
@@ -75,6 +148,7 @@ export const queryUser = () => ({
   },
 });
 
+/** ******* Timezone ********/
 export const QUERY_TZ_REQUEST = 'modules/home/QUERY_TZ_REQUEST';
 export const QUERY_TZ_SUCCESS = 'modules/home/QUERY_TZ_SUCCESS';
 export const QUERY_TZ_FAILURE = 'modules/home/QUERY_TZ_FAILURE';
@@ -86,13 +160,37 @@ export const queryTZ = () => ({
   },
 });
 
-export const POST_USER_NICKNAME_REQUEST = 'modules/home/POST_USER_NICKNAME_REQUEST';
-export const POST_USER_NICKNAME_SUCCESS = 'modules/home/POST_USER_NICKNAME_SUCCESS';
-export const POST_USER_NICKNAME_FAILURE = 'modules/home/POST_USER_NICKNAME_FAILURE';
+/** ******* Matches ********/
+export const QUERY_MATCH_REQUEST = 'modules/home/QUERY_MATCH_REQUEST';
+export const QUERY_MATCH_SUCCESS = 'modules/home/QUERY_MATCH_SUCCESS';
+export const QUERY_MATCH_FAILURE = 'modules/home/QUERY_MATCH_FAILURE';
+
+export const queryMatch = () => ({
+  [CALL_GQL]: {
+    types: [QUERY_MATCH_REQUEST, QUERY_MATCH_SUCCESS, QUERY_MATCH_FAILURE],
+    promise: client => client.query(graphqlMatch),
+  },
+});
+
+/** ******* Teams ********/
+export const QUERY_TEAM_REQUEST = 'modules/home/QUERY_TEAM_REQUEST';
+export const QUERY_TEAM_SUCCESS = 'modules/home/QUERY_TEAM_SUCCESS';
+export const QUERY_TEAM_FAILURE = 'modules/home/QUERY_TEAM_FAILURE';
+
+export const queryTeam = () => ({
+  [CALL_GQL]: {
+    types: [QUERY_TEAM_REQUEST, QUERY_TEAM_SUCCESS, QUERY_TEAM_FAILURE],
+    promise: client => client.query(graphqlTeam),
+  },
+});
+
+export const POST_USER_REQUEST = 'modules/home/POST_USER_REQUEST';
+export const POST_USER_SUCCESS = 'modules/home/POST_USER_SUCCESS';
+export const POST_USER_FAILURE = 'modules/home/POST_USER_FAILURE';
 
 export const postUserKey = (key, value) => ({
   [CALL_GQL]: {
-    types: [POST_USER_NICKNAME_REQUEST, POST_USER_NICKNAME_SUCCESS, POST_USER_NICKNAME_FAILURE],
+    types: [POST_USER_REQUEST, POST_USER_SUCCESS, POST_USER_FAILURE],
     promise: client => client.mutation(
       `{
         User(
@@ -112,6 +210,13 @@ export const postUser = (key, value) => async (dispatch) => {
   dispatch(queryUser());
 };
 
+export const init = () => (dispatch) => {
+  dispatch(queryUser());
+  dispatch(queryTZ());
+  dispatch(queryMatch());
+  dispatch(queryTeam());
+};
+
 /*****************************************************************************
   * Reducer
   *****************************************************************************/
@@ -128,6 +233,10 @@ export default (state = initialState, action) => {
       return state.setIn(['user'], response.data.User);
     case QUERY_TZ_SUCCESS:
       return state.setIn(['tz'], response.data.Tz);
+    case QUERY_MATCH_SUCCESS:
+      return state.setIn(['match'], response.data.Match);
+    case QUERY_TEAM_SUCCESS:
+      return state.setIn(['team'], response.data.Teams);
     default:
       return state;
   }

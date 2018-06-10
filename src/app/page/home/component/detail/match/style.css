@@ -1,0 +1,64 @@
+.match {
+  margin: 10px 20px;
+  border-radius: 3px;
+  border: 1px solid var(--palette-grey-100);
+  height: 100px;
+  background-color: var(--palette-grey-50);
+  & .top {
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    /*justify-content: stretch;*/
+
+    border-bottom: 1px solid var(--palette-grey-100);
+
+    & .index {
+      width: 10%;
+    }
+    & .stage {
+      width: 30%;
+    }
+
+    & .index, & .stage {
+      height: 100%;
+      line-height: 40px;
+      padding: 0 10px;
+      border-right: 1px solid var(--palette-grey-100);
+    }
+    & .time {
+      width: 60%;
+      line-height: 40px;
+      padding-left: 10px;
+    }
+    & .index, & .stage, & .time {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+  & .bottom {
+    height: calc(100% - 40px);
+    display: flex;
+    flex-direction: row;
+    /*justify-content: space-around;*/
+    align-items: center;
+
+    & .home, & .away {
+      width: 40%;
+      text-align: center;
+    }
+
+    & .score {
+      width: 20%;
+      text-align: center;
+    }
+
+    & .flag {
+      display: inline-block;
+      height: auto;
+      width: 45px;
+      margin-right: 10px;
+    }
+  }
+
+}

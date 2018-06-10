@@ -15,6 +15,7 @@ class Header extends React.Component {
     user: PropTypes.object.isRequired,
     tz: PropTypes.arrayOf(PropTypes.object).isRequired,
     postUser: PropTypes.func.isRequired,
+    init: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -56,9 +57,10 @@ class Header extends React.Component {
     });
   }
 
-  handleUserSubmit = field => () => {
-    this.props.postUser(field, this.state[field]);
+  handleUserSubmit = field => async () => {
+    await this.props.postUser(field, this.state[field]);
 
+    if (field === 'timezone') this.props.init();
     this.setState({
       nickNameEdit: false,
       timezoneEdit: false,
@@ -169,6 +171,7 @@ const mapState = state => ({
 
 const mapDispath = ({
   postUser: HomeModule.postUser,
+  init: HomeModule.init,
 });
 
 export default connect(mapState, mapDispath)(Header);
