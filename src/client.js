@@ -12,6 +12,8 @@ class ApiClient {
       } = {}) => {
         const request = superagent(method, path);
 
+        const token = localStorage.getItem('worldcup');
+        if (token && request.url.includes('graphql')) request.set('Authorization', `Bearer ${token}`);
         if (params) request.query(params);
         if (data) request.send(data);
         if (responseType) request.responseType(responseType);

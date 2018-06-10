@@ -4,8 +4,12 @@ export const CALL_GQL = 'Call GQL';
 const API_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 const GQL_METHODS = ['query', 'mutation'];
 
+const protocol = 'https';
+const apiHost = 'worldcup.kuang1987.me';
+const apiProxy = `${protocol}://${apiHost}`;
+
+
 export default function clientMiddleware (client) {
-  console.log(client);
   const apiClient = API_METHODS.reduce((result, method) => ({
     ...result,
     [method]: (path, params) => (
@@ -17,7 +21,7 @@ export default function clientMiddleware (client) {
   const gqlClient = GQL_METHODS.reduce((result, method) => ({
     ...result,
     [method]: (gql, args) => (
-      client.post('graphql', {
+      client.post(`${apiProxy}/graphql`, {
         data: {
           query: `${method} ${gql}`,
           ...args,

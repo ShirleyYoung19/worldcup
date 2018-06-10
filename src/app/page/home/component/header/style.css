@@ -1,0 +1,43 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  height: 60px;
+  width: 100%;
+  justify-content: space-between;
+  border-bottom: solid 1px var(--palette-grey-100);
+  & .left {
+    margin-left: 30px;
+    line-height: 60px;
+    font-size: 20px;
+  }
+
+  & .right {
+    margin-right: 30px;
+    line-height: 60px;
+    font-size: 16px;
+
+    & .info {
+      & .icon {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.menu {
+  width: 300px;
+  & .item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .edit {
+    margin-left: 20px;
+  }
+}
+
+.timezone {
+  width: 250px;
+}
