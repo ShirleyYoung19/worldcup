@@ -23,7 +23,7 @@ class Detail extends React.Component {
   }
 
   state ={
-    current: STATUS.TOGO,
+    current: STATUS.ONGOING,
   }
 
   handleMenuClick = (e) => {

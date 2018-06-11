@@ -1,5 +1,5 @@
 export const STATUS = {
   ONGOING: 'onging',
-  DONE: 'gone',
+  DONE: 'done',
   TOGO: 'togo',
 };

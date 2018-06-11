@@ -1,0 +1,80 @@
+.page {
+  min-width: 1024px;
+
+  & .container {
+    height: calc(100vh - 60px);
+    width: 100%;
+    & .detail {
+      width: 55%;
+      height: 100%;
+      display: inline-block;
+    }
+
+    & .chart {
+      padding: 20px;
+      padding-left: 0;
+      width: 45%;
+      height: 100%;
+      display: inline-block;
+      vertical-align: top;
+
+      & .score {
+        & .total {
+          font-size: 52px;
+          font-weight: bold;
+          height: calc(100% - 40px);
+          text-align: center;
+          padding-top: 30%;
+        }
+      }
+
+      & .golden {
+        & .team {
+          & .country, & .player {
+            display: block;
+            width: 80%;
+            margin: 30px auto;
+          }
+        }
+
+      }
+
+      & .score, & .rank {
+        margin-right: 20px;
+      }
+
+      & .score, & .golden {
+        margin-bottom: 20px;
+      }
+
+      & .score, & .golden, & .rank, & .goal {
+        display: inline-block;
+        vertical-align: top;
+        width: calc(50% - 10px);
+        height: calc(50% - 10px);
+        display: inline-block;
+        border: 1px solid var(--palette-grey-100);
+      }
+
+      & .header {
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+    }
+  }
+}
+
+.countryOption, .playerOption {
+  height: 45px;
+  line-height: 45px;
+}
+
+.flag {
+  display: inline-block;
+  width: 30px;
+  margin-right: 15px;
+}

@@ -4,61 +4,131 @@
   border: 1px solid var(--palette-grey-100);
   height: 100px;
   background-color: var(--palette-grey-50);
-  & .top {
-    height: 40px;
+
+  & .left {
+    height: 100%;
+    & .top {
+      height: 40px;
+      display: flex;
+      flex-direction: row;
+      /*justify-content: stretch;*/
+
+      border-bottom: 1px solid var(--palette-grey-100);
+
+      & .index {
+        width: 10%;
+      }
+      & .stage {
+        width: 30%;
+      }
+
+      & .index, & .stage {
+        height: 100%;
+        line-height: 40px;
+        padding: 0 10px;
+        border-right: 1px solid var(--palette-grey-100);
+      }
+      & .time {
+        width: 60%;
+        line-height: 40px;
+        padding-left: 10px;
+      }
+      & .index, & .stage, & .time {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+    & .bottom {
+      height: calc(100% - 40px);
+      display: flex;
+      flex-direction: row;
+      /*justify-content: space-around;*/
+      align-items: center;
+
+      & .home, & .away {
+        width: 40%;
+        text-align: center;
+      }
+
+      & .score {
+        width: 20%;
+        text-align: center;
+      }
+
+      & .flag {
+        display: inline-block;
+        height: auto;
+        width: 45px;
+        margin-right: 10px;
+      }
+    }
+  }
+
+  &.onging {
     display: flex;
     flex-direction: row;
-    /*justify-content: stretch;*/
-
-    border-bottom: 1px solid var(--palette-grey-100);
-
-    & .index {
-      width: 10%;
-    }
-    & .stage {
-      width: 30%;
-    }
-
-    & .index, & .stage {
-      height: 100%;
-      line-height: 40px;
-      padding: 0 10px;
+    & .left {
+      flex: auto;
+      width: 70%;
       border-right: 1px solid var(--palette-grey-100);
     }
-    & .time {
-      width: 60%;
-      line-height: 40px;
-      padding-left: 10px;
-    }
-    & .index, & .stage, & .time {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    & .right {
+      flex: auto;
+      height: 100%;
+      width: 30%;
+      padding: 30px 0;
+      & .select {
+        width: 130px;
+        display: block;
+        margin: auto;
+      }
     }
   }
-  & .bottom {
-    height: calc(100% - 40px);
+
+  &.done {
     display: flex;
     flex-direction: row;
-    /*justify-content: space-around;*/
-    align-items: center;
 
-    & .home, & .away {
-      width: 40%;
-      text-align: center;
+    & .left {
+      width: 70%;
+      border-right: 1px solid var(--palette-grey-100);
     }
 
-    & .score {
-      width: 20%;
+    & .right {
+      display: flex;
+      width: 30%;
       text-align: center;
-    }
+      flex-direction: row;
+      /*align-self: center;*/
 
-    & .flag {
-      display: inline-block;
-      height: auto;
-      width: 45px;
-      margin-right: 10px;
+      & .winner {
+        height: 100%;
+        width: 50%;
+        & .team {
+          border-right: 1px solid var(--palette-grey-100);
+        }
+      }
+
+      & .guess {
+        height: 100%;
+        width: 50%;
+        & .title {
+          border-right: none;
+        }
+      }
+
+      & .title {
+        height: 40px;
+        line-height: 40px;
+        border-right: 1px solid var(--palette-grey-100);
+        border-bottom: 1px solid var(--palette-grey-100);
+      }
+
+      & .team {
+        height: 60px;
+        line-height: 60px;
+      }
     }
   }
-
 }

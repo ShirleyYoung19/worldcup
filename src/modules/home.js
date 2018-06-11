@@ -6,19 +6,38 @@ import { CALL_GQL } from 'store/middleware/client';
  * Selectors
  *****************************************************************************/
 
-const combineMatchAndTeam = (matches, teams) => {
+const combineMatchAndTeam = (matches = [], teams = [], matchGuessRecords = []) => {
   const result = [];
-  matches.forEach(({ homeTeam, awayTeam, ...others } = {}) => {
-    const { name: homeTeamName, flagUrl: homeTeamFlag } = teams.find(({ _id }) => (String(_id) === String(homeTeam))) || {};
-    const { name: awayTeamName, flagUrl: awayTeamFlag } = teams.find(({ _id }) => (String(_id) === String(awayTeam))) || {};
+  matches.forEach(({ homeTeam, awayTeam, _id, ...others } = {}) => {
+    const { name: homeTeamName, flagUrl: homeTeamFlag } = teams.find(({ _id: id }) => (String(id) === String(homeTeam))) || {};
+    const { name: awayTeamName, flagUrl: awayTeamFlag } = teams.find(({ _id: id }) => (String(id) === String(awayTeam))) || {};
+    const { guess } = matchGuessRecords.find(({ match } = {}) => String(_id) === String(match)) || {};
+
+    let guessName;
+    if (guess) {
+      if (String(guess) === String(homeTeam)) {
+        guessName = homeTeamName;
+      } else if (String(guess) === String(awayTeam)) {
+        guessName = awayTeamName;
+      } else {
+        guessName = guess;
+      }
+    } else {
+      guessName = undefined;
+    }
+
+
     result.push({
       homeTeam,
       awayTeam,
+      _id,
       ...others,
       homeTeamName,
       homeTeamFlag,
       awayTeamName,
       awayTeamFlag,
+      guess,
+      guessName,
     });
   });
 
@@ -36,10 +55,34 @@ export const getMatch = state => state.getIn(['modules', 'home', 'match']);
 export const onGoingMatch = createSelector(
   getTeam,
   getMatch,
-  (teams = [], matches = []) => {
+  getUser,
+  (teams = [], matches = [], user = {}) => {
+    const { matchGuessRecords = [] } = user;
     const filteredMatches = matches.filter(({ started, available } = {}) => !started && available) || [];
-    return combineMatchAndTeam(filteredMatches, teams);
+    return combineMatchAndTeam(filteredMatches, teams, matchGuessRecords);
   },
+);
+
+export const getPlayers = createSelector(
+  getTeam,
+  (teams = []) => {
+    let result = [];
+    teams.forEach(({ players = [] } = {}) => {
+      result = [...result, ...players];
+    });
+    console.log(result);
+    return result;
+  },
+);
+
+export const getGoldenPlayers = createSelector(
+  getPlayers,
+  getUser,
+  (players = [], { goldenPlayerGuessRecord } = {}) => {
+    const { name } = players.find(({ _id } = {}) => String(_id) === String(goldenPlayerGuessRecord)) || {};
+    return name;
+  },
+
 );
 
 export const doneMatch = createSelector(
@@ -102,6 +145,7 @@ const graphqlMatch = `{
   available
   endWay
   started
+  _id
 }
 }`;
 
@@ -209,6 +253,39 @@ export const postUser = (key, value) => async (dispatch) => {
   await dispatch(postUserKey(key, value));
   dispatch(queryUser());
 };
+
+export const POST_GUESS_RECORD_REQUEST = 'modules/home/POST_GUESS_RECORD_REQUEST';
+export const POST_GUESS_RECORD_SUCCESS = 'modules/home/POST_GUESS_RECORD_SUCCESS';
+export const POST_GUESS_RECORD_FAILURE = 'modules/home/POST_GUESS_RECORD_FAILURE';
+
+export const postUserGuess = (id, guess) => ({
+  [CALL_GQL]: {
+    types: [POST_GUESS_RECORD_REQUEST, POST_GUESS_RECORD_SUCCESS, POST_GUESS_RECORD_FAILURE],
+    promise: client => client.mutation(
+      `{
+        User(
+          data:{
+            matchGuessRecord: {
+              match: "${id}",
+              guess: "${guess}"
+            }
+          }
+        ) {
+          matchGuessRecords{
+            match
+            guess
+          }
+        }
+      }`,
+    ),
+  },
+});
+
+export const postUserGuessRecord = (id, guess) => async(dispatch) => {
+  await dispatch(postUserGuess(id, guess));
+  dispatch(queryUser());
+};
+
 
 export const init = () => (dispatch) => {
   dispatch(queryUser());
