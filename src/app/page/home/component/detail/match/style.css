@@ -51,6 +51,12 @@
         text-align: center;
       }
 
+      & .info {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
       & .score {
         width: 20%;
         text-align: center;
@@ -59,7 +65,7 @@
       & .flag {
         display: inline-block;
         height: auto;
-        width: 45px;
+        width: 25px;
         margin-right: 10px;
       }
     }
@@ -79,7 +85,7 @@
       width: 30%;
       padding: 30px 0;
       & .select {
-        width: 130px;
+        width: 120px;
         display: block;
         margin: auto;
       }
@@ -126,6 +132,9 @@
       }
 
       & .team {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         height: 60px;
         line-height: 60px;
       }

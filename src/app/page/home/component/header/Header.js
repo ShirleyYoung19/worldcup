@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { Menu, Dropdown, Button, Input, Select } from 'antd';
 
 import * as HomeModule from 'modules/home';
+import * as AuthModule from 'modules/auth';
 import style from './style.css';
 
 const hasInput = value => (value !== undefined && value !== null);
@@ -16,6 +17,7 @@ class Header extends React.Component {
     tz: PropTypes.arrayOf(PropTypes.object).isRequired,
     postUser: PropTypes.func.isRequired,
     init: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -69,6 +71,7 @@ class Header extends React.Component {
 
   handleNickNameChange = (e) => {
     const { value } = e.target;
+    if (!value) return;
     this.setState({
       nickName: value,
     });
@@ -79,6 +82,10 @@ class Header extends React.Component {
    }, () => {
      this.handleUserSubmit('timezone')();
    });
+ }
+
+ handleLogoutClick = () => {
+   this.props.logout();
  }
 
 
@@ -140,6 +147,9 @@ class Header extends React.Component {
              (<Button className={style.edit} onClick={this.handleTimezoneEditClick}>Edit</Button>)
          }
        </Menu.Item>
+       <Menu.Item key="1" className={style.item}>
+         <Button className={style.logout} onClick={this.handleLogoutClick}>Logout</Button>
+       </Menu.Item>
      </Menu>
    );
    return (
@@ -172,6 +182,7 @@ const mapState = state => ({
 const mapDispath = ({
   postUser: HomeModule.postUser,
   init: HomeModule.init,
+  logout: AuthModule.logout,
 });
 
 export default connect(mapState, mapDispath)(Header);

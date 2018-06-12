@@ -5,7 +5,7 @@
     height: calc(100vh - 60px);
     width: 100%;
     & .detail {
-      width: 55%;
+      width: 50%;
       height: 100%;
       display: inline-block;
     }
@@ -13,7 +13,7 @@
     & .chart {
       padding: 20px;
       padding-left: 0;
-      width: 45%;
+      width: 50%;
       height: 100%;
       display: inline-block;
       vertical-align: top;
@@ -37,6 +37,72 @@
           }
         }
 
+      }
+
+      & .rank {
+
+        & .tableContainer {
+          height: calc(100% - 40px);
+          overflow-y: auto;
+          & .table {
+            width: 100%;
+          }
+          & td {
+            height: 30px;
+          }
+          & td {
+            text-align: center;
+          }
+          & .index {
+            width: 10%;
+          }
+          & .name {
+            width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          & .guessScore {
+            width: 10%;
+          }
+        }
+      }
+
+      & .goal {
+        & .tableContainer {
+          height: calc(100% - 40px);
+          overflow-y: auto;
+
+          & .table {
+            width: 100%;
+          }
+
+          & td {
+            height: 30px;
+          }
+          & td {
+            text-align: center;
+          }
+          & .index {
+            width: 15%;
+          }
+
+          & .name {
+            text-align: left;
+            width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            & img {
+              width: 20px;
+              vertical-align: middle;
+            }
+          }
+          & .guessScore {
+            width: 15%;
+          }
+        }
       }
 
       & .score, & .rank {
@@ -77,4 +143,40 @@
   display: inline-block;
   width: 30px;
   margin-right: 15px;
+}
+
+
+.loadingContainer, .errorContainer {
+  width: 100vw;
+  height: 100vh;
+}
+
+.errorContainer {
+  position: relative;
+  & .error {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+.loadingContainer {
+  position: relative;
+  & .img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 150px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('./loading.gif');
+  }
 }

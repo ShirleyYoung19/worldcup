@@ -52,16 +52,11 @@ export const getTz = state => state.getIn(['modules', 'home', 'tz']);
 export const getTeam = state => state.getIn(['modules', 'home', 'team']);
 export const getMatch = state => state.getIn(['modules', 'home', 'match']);
 
-export const onGoingMatch = createSelector(
-  getTeam,
-  getMatch,
-  getUser,
-  (teams = [], matches = [], user = {}) => {
-    const { matchGuessRecords = [] } = user;
-    const filteredMatches = matches.filter(({ started, available } = {}) => !started && available) || [];
-    return combineMatchAndTeam(filteredMatches, teams, matchGuessRecords);
-  },
-);
+export const getUserRank = state => state.getIn(['modules', 'home', 'userRank']);
+
+export const getLoading = state => state.getIn(['modules', 'home', 'loading']);
+export const getLoaded = state => state.getIn(['modules', 'home', 'loaded']);
+
 
 export const getPlayers = createSelector(
   getTeam,
@@ -71,7 +66,6 @@ export const getPlayers = createSelector(
       const teamPlays = players.map((player = {}) => ({ ...player, teamId: _id, teamName: name, flagUrl }));
       result = [...result, ...teamPlays];
     });
-    console.log(result);
     return result;
   },
 );
@@ -84,6 +78,37 @@ export const getGoldenPlayers = createSelector(
     return { name, team };
   },
 
+);
+
+export const getUserRankSorted = createSelector(
+  getUserRank,
+  (_users = []) => {
+    const users = [..._users];
+    users.sort((prev, next) => (prev.guessScore < next.guessScore));
+
+    return users.slice(0, 10);
+  },
+);
+
+export const getPlayerRankSorted = createSelector(
+  getPlayers,
+  (_players = []) => {
+    const players = [..._players];
+    players.sort((prev, next) => (prev.goal < next.goal));
+
+    return players.slice(0, 10);
+  },
+);
+
+export const onGoingMatch = createSelector(
+  getTeam,
+  getMatch,
+  getUser,
+  (teams = [], matches = [], user = {}) => {
+    const { matchGuessRecords = [] } = user;
+    const filteredMatches = matches.filter(({ started, available } = {}) => !started && available) || [];
+    return combineMatchAndTeam(filteredMatches, teams, matchGuessRecords);
+  },
 );
 
 export const doneMatch = createSelector(
@@ -180,6 +205,22 @@ const graphqlUsersRanking = `{
  * Types & Action Creators
  *****************************************************************************/
 
+export const START_INIT_LOADING = 'modules/home/START_INIT_LOADING';
+export const END_INIT_LOADING_SUCCESS = 'modules/home/END_INIT_LOADING_SUCCESS';
+export const END_INIT_LOADING_FAILURE = 'modules/home/END_INIT_LOADING_FAILURE';
+
+export const startLoading = () => ({
+  type: START_INIT_LOADING,
+});
+
+export const endLoadingSuccess = () => ({
+  type: END_INIT_LOADING_SUCCESS,
+});
+
+export const endLoadingFailure = () => ({
+  type: END_INIT_LOADING_FAILURE,
+});
+
 /** ******* USER ********/
 
 export const QUERY_USER_REQUEST = 'modules/home/QUERY_USER_REQUEST';
@@ -226,6 +267,18 @@ export const queryTeam = () => ({
   [CALL_GQL]: {
     types: [QUERY_TEAM_REQUEST, QUERY_TEAM_SUCCESS, QUERY_TEAM_FAILURE],
     promise: client => client.query(graphqlTeam),
+  },
+});
+
+/** ******* User Rank ********/
+export const QUERY_USER_RANK_REQUEST = 'modules/home/QUERY_USER_RANK_REQUEST';
+export const QUERY_USER_RANK_SUCCESS = 'modules/home/QUERY_USER_RANK_SUCCESS';
+export const QUERY_USER_RANK_FAILURE = 'modules/home/QUERY_USER_RANK_FAILURE';
+
+export const queryUserRank = () => ({
+  [CALL_GQL]: {
+    types: [QUERY_USER_RANK_REQUEST, QUERY_USER_RANK_SUCCESS, QUERY_USER_RANK_FAILURE],
+    promise: client => client.query(graphqlUsersRanking),
   },
 });
 
@@ -288,11 +341,19 @@ export const postUserGuessRecord = (id, guess) => async(dispatch) => {
 };
 
 
-export const init = () => (dispatch) => {
-  dispatch(queryUser());
-  dispatch(queryTZ());
-  dispatch(queryMatch());
-  dispatch(queryTeam());
+export const init = () => async (dispatch) => {
+  dispatch(startLoading());
+  try {
+    await dispatch(queryUser());
+    await dispatch(queryTZ());
+    await dispatch(queryMatch());
+    await dispatch(queryTeam());
+    await dispatch(queryUserRank());
+    dispatch(endLoadingSuccess());
+  } catch (error) {
+    dispatch(endLoadingFailure());
+    throw error;
+  }
 };
 
 /*****************************************************************************
@@ -302,6 +363,8 @@ export const init = () => (dispatch) => {
 const initialState = Map({
   user: {},
   tz: [],
+  loading: undefined,
+  loaded: undefined,
 });
 
 export default (state = initialState, action) => {
@@ -315,6 +378,14 @@ export default (state = initialState, action) => {
       return state.setIn(['match'], response.data.Match);
     case QUERY_TEAM_SUCCESS:
       return state.setIn(['team'], response.data.Teams);
+    case QUERY_USER_RANK_SUCCESS:
+      return state.setIn(['userRank'], response.data.UsersRanking);
+    case START_INIT_LOADING:
+      return state.setIn(['loading'], true).setIn(['loaded'], false);
+    case END_INIT_LOADING_SUCCESS:
+      return state.setIn(['loading'], false).setIn(['loaded'], true);
+    case END_INIT_LOADING_FAILURE:
+      return state.setIn(['loading'], false).setIn(['loaded'], false);
     default:
       return state;
   }

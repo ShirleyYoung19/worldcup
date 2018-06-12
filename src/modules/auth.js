@@ -110,6 +110,12 @@ export const verify = () => (dispatch) => {
   }
 };
 
+export const logout = () => (dispatch) => {
+  window.localStorage.removeItem('worldcup');
+  dispatch(setToken());
+  dispatch(setAuth());
+};
+
 
 export const initialState = Map({
   auth: undefined,
