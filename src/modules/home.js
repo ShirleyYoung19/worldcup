@@ -67,8 +67,9 @@ export const getPlayers = createSelector(
   getTeam,
   (teams = []) => {
     let result = [];
-    teams.forEach(({ players = [] } = {}) => {
-      result = [...result, ...players];
+    teams.forEach(({ _id, name, flagUrl, players = [] } = {}) => {
+      const teamPlays = players.map((player = {}) => ({ ...player, teamId: _id, teamName: name, flagUrl }));
+      result = [...result, ...teamPlays];
     });
     console.log(result);
     return result;
@@ -79,8 +80,8 @@ export const getGoldenPlayers = createSelector(
   getPlayers,
   getUser,
   (players = [], { goldenPlayerGuessRecord } = {}) => {
-    const { name } = players.find(({ _id } = {}) => String(_id) === String(goldenPlayerGuessRecord)) || {};
-    return name;
+    const { name, teamId: team } = players.find(({ _id } = {}) => String(_id) === String(goldenPlayerGuessRecord)) || {};
+    return { name, team };
   },
 
 );

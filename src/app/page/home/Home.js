@@ -16,16 +16,15 @@ class Home extends React.Component {
     init: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
     postUser: PropTypes.func.isRequired,
-    getGoldenPlayer: PropTypes.string,
+    getGoldenPlayer: PropTypes.object,
   }
 
   static defaultProps = {
-    getGoldenPlayers: undefined,
+    getGoldenPlayer: {},
   }
 
   state = {
     country: undefined,
-    player: undefined,
   }
 
   componentDidMount () {
@@ -39,17 +38,13 @@ class Home extends React.Component {
   }
 
   handlePlayerChange = (player) => {
-    this.setState({
-      player,
-    });
-
     this.props.postUser('goldenPlayerGuessRecord', player);
   }
 
   render () {
     const { user: { guessScore } = {}, teams = [], getGoldenPlayer } = this.props;
 
-    const { country, player } = this.state;
+    const { country } = this.state;
 
     const { players = [] } = teams.find(({ _id } = {}) => String(_id) === String(country)) || {};
     return (
@@ -79,6 +74,7 @@ class Home extends React.Component {
                   className={style.country}
                   placeholder="Select country"
                   onChange={this.handleCountryChange}
+                  value={country || getGoldenPlayer.team}
                 >
                   {teams.map(({ _id, name, flagUrl }) => (
                     <Option className={style.countryOption} value={_id} key={_id}>
@@ -91,7 +87,7 @@ class Home extends React.Component {
                   className={style.player}
                   placeholder="Select player"
                   onChange={this.handlePlayerChange}
-                  value={getGoldenPlayer}
+                  value={getGoldenPlayer.name}
                 >
                   { players.map(({ _id, name }) => (
                     <Option className={style.playerOption} value={_id} key={_id}>
