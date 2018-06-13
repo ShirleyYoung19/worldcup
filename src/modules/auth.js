@@ -4,8 +4,10 @@ import { CALL_API } from 'store/middleware/client';
 import jwt from 'jsonwebtoken';
 
 
+// const protocol = 'https';
+// const apiHost = 'worldcup.kuang1987.me';
 const protocol = 'https';
-const apiHost = 'worldcup.kuang1987.me';
+const apiHost = 'worldcup-2018.corp.seedlinktech.com';
 const apiProxy = `${protocol}://${apiHost}`;
 
 /*****************************************************************************

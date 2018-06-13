@@ -8,11 +8,11 @@ import { CALL_GQL } from 'store/middleware/client';
 
 const combineMatchAndTeam = (matches = [], teams = [], matchGuessRecords = []) => {
   const result = [];
-  matches.forEach(({ homeTeam, awayTeam, _id, ...others } = {}) => {
+  matches.forEach(({ homeTeam, awayTeam, _id, winner, ...others } = {}) => {
     const { name: homeTeamName, flagUrl: homeTeamFlag } = teams.find(({ _id: id }) => (String(id) === String(homeTeam))) || {};
     const { name: awayTeamName, flagUrl: awayTeamFlag } = teams.find(({ _id: id }) => (String(id) === String(awayTeam))) || {};
-    const { guess } = matchGuessRecords.find(({ match } = {}) => String(_id) === String(match)) || {};
-
+    const { name: winnerTeamName } = teams.find(({ _id: id }) => (String(id) === String(winner))) || {};
+    const { guess } = matchGuessRecords.find(({ match: id }) => (String(_id) === String(id))) || {};
     let guessName;
     if (guess) {
       if (String(guess) === String(homeTeam)) {
@@ -26,11 +26,15 @@ const combineMatchAndTeam = (matches = [], teams = [], matchGuessRecords = []) =
       guessName = undefined;
     }
 
+    if (winnerTeamName) {
+      winner = winnerTeamName;
+    }
 
     result.push({
       homeTeam,
       awayTeam,
       _id,
+      winner,
       ...others,
       homeTeamName,
       homeTeamFlag,
@@ -84,9 +88,8 @@ export const getUserRankSorted = createSelector(
   getUserRank,
   (_users = []) => {
     const users = [..._users];
-    users.sort((prev, next) => (prev.guessScore < next.guessScore));
-
-    return users.slice(0, 10);
+    const sorted_users = users.sort((prev, next) => (next.guessScore - prev.guessScore));
+    return sorted_users.slice(0, 10);
   },
 );
 
@@ -94,7 +97,7 @@ export const getPlayerRankSorted = createSelector(
   getPlayers,
   (_players = []) => {
     const players = [..._players];
-    players.sort((prev, next) => (prev.goal < next.goal));
+    players.sort((prev, next) => (next.goal - prev.goal));
 
     return players.slice(0, 10);
   },
@@ -114,9 +117,11 @@ export const onGoingMatch = createSelector(
 export const doneMatch = createSelector(
   getTeam,
   getMatch,
-  (teams = [], matches = []) => {
-    const filteredMatches = matches.filter(({ started, available } = {}) => started && available) || [];
-    return combineMatchAndTeam(filteredMatches, teams);
+  getUser,
+  (teams = [], matches = [], user = {}) => {
+    const { matchGuessRecords = [] } = user;
+    const filteredMatches = matches.filter(({ started, available } = {}) => started && !available) || [];
+    return combineMatchAndTeam(filteredMatches, teams, matchGuessRecords);
   },
 );
 

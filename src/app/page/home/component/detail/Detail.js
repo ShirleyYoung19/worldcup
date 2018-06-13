@@ -48,10 +48,10 @@ class Detail extends React.Component {
           mode="horizontal"
         >
           <Menu.Item key={STATUS.ONGOING}>
-            On going
+            Open
           </Menu.Item>
           <Menu.Item key={STATUS.DONE}>
-            Done
+            Close
           </Menu.Item>
           <Menu.Item key={STATUS.TOGO}>
             To go
