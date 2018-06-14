@@ -60,6 +60,7 @@ class Header extends React.Component {
   }
 
   handleUserSubmit = field => async () => {
+    if (!this.state[field]) return;
     await this.props.postUser(field, this.state[field]);
 
     if (field === 'timezone') this.props.init();
@@ -71,7 +72,6 @@ class Header extends React.Component {
 
   handleNickNameChange = (e) => {
     const { value } = e.target;
-    if (!value) return;
     this.setState({
       nickName: value,
     });
