@@ -5,7 +5,7 @@ const API_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
 const GQL_METHODS = ['query', 'mutation'];
 
 const protocol = 'https';
-const apiHost = 'worldcup.kuang1987.me';
+const apiHost = 'worldcup-2018.corp.seedlinktech.com';
 const apiProxy = `${protocol}://${apiHost}`;
 
 

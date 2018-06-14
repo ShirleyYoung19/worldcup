@@ -118,7 +118,7 @@ class Reset extends React.Component {
                 <Input
                   prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="password"
-                  placeholder="Password"
+                  placeholder="Current Password"
                   onBlur={this.handleBlur('oldPassword')}
                 />,
               )}
@@ -134,7 +134,7 @@ class Reset extends React.Component {
                 <Input
                   prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="password"
-                  placeholder="Password"
+                  placeholder="New Password"
                   onBlur={this.handleBlur('newPassword')}
                 />,
               )}
@@ -151,7 +151,7 @@ class Reset extends React.Component {
                 <Input
                   prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="Confirm New Password"
                 />,
               )}
             </FormItem>
